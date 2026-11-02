@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dom-Silhouette (eigene Zeichnung), weiß auf rotem Grund -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="
+        M30,80 L30,46 L36,22 L42,46 L42,58 L54,50 L66,58 L66,46 L72,22 L78,46 L78,80 Z
+        M34,64 L34,55 Q36,51 38,55 L38,64 Z
+        M70,64 L70,55 Q72,51 74,55 L74,64 Z
+        M51,80 L51,72 Q54,67 57,72 L57,80 Z
+        M46,68 L46,63 Q47.5,60.5 49,63 L49,68 Z
+        M59,68 L59,63 Q60.5,60.5 62,63 L62,68 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M52.5,50.5 L54,41 L55.5,50.5 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M26,80 L82,80 L82,83 L26,83 Z" />
+</vector>

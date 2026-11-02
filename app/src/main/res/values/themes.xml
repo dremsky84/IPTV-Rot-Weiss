@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.RotWeiss" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#140C0D</item>
+        <item name="android:statusBarColor">#140C0D</item>
+        <item name="android:navigationBarColor">#1E1416</item>
+    </style>
+</resources>
