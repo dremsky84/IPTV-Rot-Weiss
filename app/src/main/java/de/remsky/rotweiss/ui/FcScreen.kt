@@ -2,6 +2,7 @@
 
 package de.remsky.rotweiss.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -127,19 +129,7 @@ fun FcScreen(vm: AppViewModel) {
                 val next = data.next(now)
                 val last = data.last(now)
                 LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
-                    item(key = "photo") {
-                        Box(Modifier.fillMaxWidth().height(150.dp)) {
-                            Image(
-                                painterResource(R.drawable.fan_photo), null, Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop, alignment = BiasAlignment(0f, -0.2f),
-                            )
-                            Box(
-                                Modifier.fillMaxSize().background(
-                                    Brush.verticalGradient(listOf(Color.Transparent, MaterialTheme.colorScheme.background))
-                                )
-                            )
-                        }
-                    }
+                    item(key = "photo") { FcHero() }
                     if (next != null) {
                         item(key = "next") { NextMatchCard(vm, data, next, now) }
                     } else {
@@ -412,6 +402,47 @@ fun FcChannelsScreen(vm: AppViewModel) {
                     Checkbox(on, { vm.toggleFcChannel(ch.streamId) })
                 }
             }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- Kopfbereich mit Foto
+
+/** Foto im Rahmen, darüber eine Wimpelkette, darunter Stadion und Dom als Silhouette. */
+@Composable
+private fun FcHero() {
+    Column(
+        Modifier.fillMaxWidth()
+            .background(Brush.verticalGradient(listOf(Color(0xFF3A0A0E), MaterialTheme.colorScheme.background))),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // Wimpelkette in Rot und Weiß
+        Canvas(Modifier.fillMaxWidth().height(22.dp)) {
+            val w = 26.dp.toPx()
+            val h = size.height
+            var x = 0f
+            var i = 0
+            while (x < size.width) {
+                val p = Path().apply {
+                    moveTo(x, 0f); lineTo(x + w, 0f); lineTo(x + w / 2, h); close()
+                }
+                drawPath(p, if (i % 2 == 0) FcRed else Color.White)
+                x += w
+                i++
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Image(
+            painterResource(R.drawable.fan_faces), null,
+            Modifier.height(170.dp).aspectRatio(876f / 500f)
+                .clip(RoundedCornerShape(14.dp))
+                .border(2.dp, Color.White, RoundedCornerShape(14.dp)),
+            contentScale = ContentScale.Crop,
+        )
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.Bottom) {
+            Image(painterResource(R.drawable.fc_stadium), null, Modifier.height(62.dp), contentScale = ContentScale.Fit)
+            Spacer(Modifier.weight(1f))
+            Image(painterResource(R.drawable.fc_dom), null, Modifier.height(62.dp), contentScale = ContentScale.Fit)
         }
     }
 }

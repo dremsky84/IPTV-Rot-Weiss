@@ -57,19 +57,19 @@ private fun LoginForm(vm: AppViewModel) {
         Text("Xtream-Codes-Zugang eingeben", color = Color.Gray)
         Spacer(Modifier.height(24.dp))
 
-        OutlinedTextField(
+        GuardedTextField(
             server, { server = it }, Modifier.fillMaxWidth(),
             label = { Text("Server (z. B. http://anbieter.tv:8080)") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
         )
         Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
+        GuardedTextField(
             user, { user = it }, Modifier.fillMaxWidth(),
             label = { Text("Benutzername") }, singleLine = true,
         )
         Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
+        GuardedTextField(
             pass, { pass = it }, Modifier.fillMaxWidth(),
             label = { Text("Passwort") }, singleLine = true,
             visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),

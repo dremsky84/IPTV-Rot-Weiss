@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 
 package de.remsky.rotweiss.ui
 
@@ -26,6 +26,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.VisualTransformation
+import kotlinx.coroutines.delay
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Shape
@@ -133,7 +140,7 @@ fun epgProgress(e: EpgEntry): Float {
 
 @Composable
 fun SearchField(value: String, onChange: (String) -> Unit, hint: String) {
-    OutlinedTextField(
+    GuardedTextField(
         value, onChange,
         Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         placeholder = { Text(hint) },
@@ -283,7 +290,7 @@ fun PinDialog(
         title = { Text(title) },
         text = {
             Column {
-                OutlinedTextField(
+                GuardedTextField(
                     pin, { if (it.length <= 8 && it.all(Char::isDigit)) { pin = it; wrong = false } },
                     singleLine = true,
                     label = { Text("PIN (4–8 Ziffern)") },
@@ -301,4 +308,58 @@ fun PinDialog(
         },
         dismissButton = { TextButton(onDismiss) { Text("Abbrechen") } },
     )
+}
+
+/**
+ * Textfeld mit Schutz für die Fernbedienung: Per Pfeiltasten wird das Feld nur markiert.
+ * Erst mit OK (Klick) öffnet sich die Eingabe samt Tastatur.
+ */
+@Composable
+fun GuardedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: (@Composable () -> Unit)? = null,
+    placeholder: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    isError: Boolean = false,
+    singleLine: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    shape: Shape = OutlinedTextFieldDefaults.shape,
+) {
+    val tv = TvMode.enabled
+    var editing by remember { mutableStateOf(false) }
+    val focus = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(editing) {
+        if (editing) {
+            runCatching { focus.requestFocus() }
+            delay(150)
+            keyboard?.show()
+        }
+    }
+
+    Box(modifier) {
+        OutlinedTextField(
+            value, onValueChange,
+            Modifier.fillMaxWidth().then(
+                if (tv) Modifier
+                    .focusRequester(focus)
+                    .focusProperties { canFocus = editing }
+                    .onFocusChanged { if (!it.hasFocus && editing) editing = false }
+                else Modifier
+            ),
+            label = label, placeholder = placeholder,
+            leadingIcon = leadingIcon, trailingIcon = trailingIcon,
+            isError = isError, singleLine = singleLine,
+            keyboardOptions = keyboardOptions, visualTransformation = visualTransformation,
+            shape = shape,
+        )
+        if (tv && !editing) {
+            Box(Modifier.matchParentSize().clip(shape).focusHighlight(shape).clickable { editing = true })
+        }
+    }
 }
