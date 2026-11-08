@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Logout
@@ -47,6 +48,13 @@ fun SettingsScreen(vm: AppViewModel) {
         }
         vm.savedCredentials?.let { Info("Server", it.baseUrl) }
         Item(Icons.Default.Refresh, "Listen aktualisieren", "Sender, Filme und Serien neu laden") { vm.refreshAll() }
+
+        // ------------------------------------------------ Anzeige
+        SectionHeader("Anzeige")
+        Item(
+            Icons.Default.LiveTv, "Live-Vorschau (Fernseher/Tablet)",
+            "${listOf("Aus", "Stumm", "Mit Ton")[vm.previewMode]} · Tippen zum Wechseln",
+        ) { vm.cyclePreviewMode() }
 
         // ------------------------------------------------ FC
         SectionHeader("FC")

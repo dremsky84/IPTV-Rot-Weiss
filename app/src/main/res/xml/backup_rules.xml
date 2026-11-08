@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Verschlüsselte Zugangsdaten nie sichern: der Schlüssel dazu bleibt im Android Keystore des Geräts -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="xtream_credentials.xml" />
+    <exclude domain="sharedpref" path="__androidx_security_crypto_encrypted_prefs__.xml" />
+</full-backup-content>

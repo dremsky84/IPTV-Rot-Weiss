@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.SportsSoccer
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 private fun Tab.icon(): ImageVector = when (this) {
     Tab.FC -> Icons.Default.SportsSoccer
     Tab.LIVE -> Icons.Default.LiveTv
+    Tab.ARCHIVE -> Icons.Default.History
     Tab.MOVIES -> Icons.Default.Movie
     Tab.SERIES -> Icons.Default.VideoLibrary
     Tab.FAVORITES -> Icons.Default.Favorite
@@ -31,6 +33,7 @@ private fun TabContent(vm: AppViewModel) {
     when (vm.tab) {
         Tab.FC -> FcScreen(vm)
         Tab.LIVE -> LiveScreen(vm)
+        Tab.ARCHIVE -> ArchiveScreen(vm)
         Tab.MOVIES -> MoviesScreen(vm)
         Tab.SERIES -> SeriesScreen(vm)
         Tab.FAVORITES -> FavoritesScreen(vm)

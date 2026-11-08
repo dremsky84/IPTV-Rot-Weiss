@@ -40,6 +40,29 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 fun MoviesScreen(vm: AppViewModel) {
     LaunchedEffect(Unit) { vm.ensureMovies() }
 
+    if (useWideLive()) {
+        val counts = remember(vm.movies) { vm.movies.groupingBy { it.categoryId }.eachCount() }
+        val list = vm.visibleMovies
+        VodWideLayout(
+            title = "Filme",
+            subtitle = if (vm.movies.isNotEmpty()) "${list.size} Filme" else null,
+            searchHint = "Film suchen",
+            query = vm.movieQuery, onQuery = { vm.movieQuery = it },
+            categories = vm.visibleCategories("movie", vm.movieCategories), counts = counts,
+            selectedCategory = vm.movieCategory, onCategory = { vm.movieCategory = it },
+            sort = vm.movieSort, onSort = { vm.movieSort = it },
+            loading = vm.moviesLoading && vm.movies.isEmpty(), loadingText = "Filme werden geladen …",
+            isEmpty = list.isEmpty(), emptyText = "Keine Filme gefunden",
+        ) {
+            gridItems(list, key = { it.streamId }) { m ->
+                PosterCard(m.name, m.poster, m.rating, vm.isFavorite("movie:${m.streamId}")) {
+                    vm.open(Route.MovieDetail(m))
+                }
+            }
+        }
+        return
+    }
+
     Column(Modifier.fillMaxSize()) {
         TitleBar("Filme", if (vm.movies.isNotEmpty()) "${vm.movies.size} Filme" else null) {
             SortButton(vm.movieSort) { vm.movieSort = it }

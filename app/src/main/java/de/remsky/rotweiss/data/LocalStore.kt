@@ -96,6 +96,11 @@ class LocalStore(context: Context) {
 
     // ------------------------------------------------------------ Zuletzt gesehener Sender
 
+    /** Live-Vorschau in der Breitansicht: 0 aus · 1 stumm · 2 mit Ton. */
+    var previewMode: Int
+        get() = prefs.getInt("preview_mode", 1)
+        set(v) = prefs.edit().putInt("preview_mode", v).apply()
+
     var lastChannel: Int
         get() = prefs.getInt("last_channel", -1)
         set(v) = prefs.edit().putInt("last_channel", v).apply()

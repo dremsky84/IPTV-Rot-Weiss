@@ -2,6 +2,7 @@ package de.remsky.rotweiss.ui
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 
-enum class Tab(val title: String) { FC("FC"), LIVE("Live-TV"), MOVIES("Filme"), SERIES("Serien"), FAVORITES("Meine") }
+enum class Tab(val title: String) { FC("FC"), LIVE("Live-TV"), ARCHIVE("Archiv"), MOVIES("Filme"), SERIES("Serien"), FAVORITES("Meine") }
 
 enum class SortMode(val label: String) { DEFAULT("Standard"), NEWEST("Neueste"), AZ("A–Z"), RATING("Bewertung") }
 
@@ -69,6 +70,23 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     var channels by mutableStateOf<List<Channel>>(emptyList()); private set
     var liveCategory by mutableStateOf<String?>(null)
     var liveQuery by mutableStateOf("")
+    var archiveQuery by mutableStateOf("")
+    var previewMode by mutableIntStateOf(store.previewMode); private set
+
+    fun cyclePreviewMode() {
+        previewMode = (previewMode + 1) % 3
+        store.previewMode = previewMode
+    }
+
+    /** Nur Sender mit Archiv/Catch-up (Kindersicherung beachtet). */
+    val archiveChannels: List<Channel>
+        get() {
+            val q = archiveQuery.trim()
+            return channels.filter { ch ->
+                ch.hasArchive && !isLocked("live", ch.categoryId) &&
+                    (q.isEmpty() || ch.name.contains(q, ignoreCase = true))
+            }
+        }
 
     // ------------------------------------------------------------ Filme
     var movieCategories by mutableStateOf<List<Category>>(emptyList()); private set
@@ -173,7 +191,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         movies = emptyList(); movieCategories = emptyList(); moviesLoaded = false
         seriesList = emptyList(); seriesCategories = emptyList(); seriesLoaded = false
         liveCategory = null; movieCategory = null; seriesCategory = null
-        liveQuery = ""; movieQuery = ""; seriesQuery = ""
+        liveQuery = ""; archiveQuery = ""; movieQuery = ""; seriesQuery = ""
         nowNext.clear(); epgRequested.clear()
         routes.clear()
         tab = Tab.FC

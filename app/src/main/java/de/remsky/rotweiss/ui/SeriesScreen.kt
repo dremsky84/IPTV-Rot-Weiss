@@ -42,6 +42,29 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 fun SeriesScreen(vm: AppViewModel) {
     LaunchedEffect(Unit) { vm.ensureSeries() }
 
+    if (useWideLive()) {
+        val counts = remember(vm.seriesList) { vm.seriesList.groupingBy { it.categoryId }.eachCount() }
+        val list = vm.visibleSeries
+        VodWideLayout(
+            title = "Serien",
+            subtitle = if (vm.seriesList.isNotEmpty()) "${list.size} Serien" else null,
+            searchHint = "Serie suchen",
+            query = vm.seriesQuery, onQuery = { vm.seriesQuery = it },
+            categories = vm.visibleCategories("series", vm.seriesCategories), counts = counts,
+            selectedCategory = vm.seriesCategory, onCategory = { vm.seriesCategory = it },
+            sort = vm.seriesSort, onSort = { vm.seriesSort = it },
+            loading = vm.seriesLoading && vm.seriesList.isEmpty(), loadingText = "Serien werden geladen …",
+            isEmpty = list.isEmpty(), emptyText = "Keine Serien gefunden",
+        ) {
+            gridItems(list, key = { it.seriesId }) { s ->
+                PosterCard(s.name, s.cover, s.rating, vm.isFavorite("series:${s.seriesId}")) {
+                    vm.open(Route.SeriesDetail(s))
+                }
+            }
+        }
+        return
+    }
+
     Column(Modifier.fillMaxSize()) {
         TitleBar("Serien", if (vm.seriesList.isNotEmpty()) "${vm.seriesList.size} Serien" else null) {
             SortButton(vm.seriesSort) { vm.seriesSort = it }

@@ -36,6 +36,7 @@ import de.remsky.rotweiss.data.EpgEntry
 
 @Composable
 fun LiveScreen(vm: AppViewModel) {
+    if (useWideLive()) { LiveWideScreen(vm); return }
     val ctx = LocalContext.current
     var favOnly by remember { mutableStateOf(false) }
 
@@ -65,6 +66,44 @@ fun LiveScreen(vm: AppViewModel) {
                         onPlay = { vm.playChannel(list, ch); ctx.openPlayer() },
                         onGuide = { vm.open(Route.ChannelEpg(ch)) },
                     )
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- Archiv (Sender mit Catch-up)
+
+@Composable
+fun ArchiveScreen(vm: AppViewModel) {
+    if (useWideLive()) { ArchiveWideScreen(vm); return }
+    val list = vm.archiveChannels
+    Column(Modifier.fillMaxSize()) {
+        TitleBar("Archiv", "${list.size} Sender mit Archiv · Sender wählen, dann Sendung") {}
+        SearchField(vm.archiveQuery, { vm.archiveQuery = it }, "Sender suchen")
+        if (list.isEmpty()) {
+            CenterText(
+                if (vm.channels.none { it.hasArchive }) "Dein Anbieter bietet für keinen Sender ein Archiv an."
+                else "Keine Sender gefunden",
+            )
+        } else {
+            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                items(list, key = { it.streamId }) { ch ->
+                    Row(
+                        Modifier.fillMaxWidth().clickable { vm.open(Route.ChannelEpg(ch)) }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ChannelLogo(ch)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(ch.name, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyLarge)
+                            if (ch.archiveDays > 0) {
+                                Text("${ch.archiveDays} Tage zurück", fontSize = 12.sp, color = Color.Gray)
+                            }
+                        }
+                        Icon(Icons.Default.History, null, tint = Color.Gray)
+                    }
                 }
             }
         }
