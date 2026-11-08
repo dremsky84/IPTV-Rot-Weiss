@@ -12,6 +12,8 @@ import de.remsky.rotweiss.ui.AppColors
 import de.remsky.rotweiss.ui.AppViewModel
 import de.remsky.rotweiss.ui.LoginScreen
 import de.remsky.rotweiss.ui.MainScreen
+import de.remsky.rotweiss.ui.TvMode
+import de.remsky.rotweiss.ui.TvTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -19,11 +21,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TvMode.detect(this)
         vm = ViewModelProvider(this)[AppViewModel::class.java]
         setContent {
             MaterialTheme(colorScheme = AppColors) {
-                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    if (vm.loggedIn) MainScreen(vm) else LoginScreen(vm)
+                TvTheme {
+                    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        if (vm.loggedIn) MainScreen(vm) else LoginScreen(vm)
+                    }
                 }
             }
         }

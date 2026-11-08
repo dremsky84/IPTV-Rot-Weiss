@@ -148,6 +148,7 @@ fun FcScreen(vm: AppViewModel) {
                             Row(
                                 Modifier.fillMaxWidth()
                                     .background(if (fc) FcRed.copy(alpha = 0.25f) else Color.Transparent)
+                                    .clickable(onClick = {})
                                     .padding(horizontal = 16.dp, vertical = 7.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
@@ -330,7 +331,7 @@ private fun ScheduleRow(data: FcData, m: FcMatch, now: Long) {
     val opponent = short(if (home) m.away else m.home)
     val live = m.isLive(now)
     Row(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        Modifier.fillMaxWidth().clickable(onClick = {}).padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text("${m.matchday}.", Modifier.width(30.dp), color = Color.Gray, fontSize = 13.sp)

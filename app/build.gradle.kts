@@ -10,10 +10,10 @@ android {
 
     defaultConfig {
         applicationId = "de.remsky.rotweiss"
-        minSdk = 26
+        minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
     // Fester Schlüssel: damit lassen sich neue Versionen einfach über die alte installieren
     signingConfigs {

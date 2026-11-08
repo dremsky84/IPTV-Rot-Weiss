@@ -19,6 +19,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -78,6 +80,8 @@ fun MovieDetailScreen(vm: AppViewModel, m: Movie) {
         loaded = true
     }
     val key = "movie:${m.streamId}"
+    val playFocus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { if (TvMode.enabled) runCatching { playFocus.requestFocus() } }
     val resume = vm.history.firstOrNull { it.key == key }
     val fav = vm.isFavorite(key)
 
@@ -111,7 +115,7 @@ fun MovieDetailScreen(vm: AppViewModel, m: Movie) {
         Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Button(
                 onClick = { vm.playMovie(m); ctx.openPlayer() },
-                modifier = Modifier.weight(1f).height(48.dp),
+                modifier = Modifier.weight(1f).height(48.dp).focusRequester(playFocus),
             ) {
                 Icon(Icons.Default.PlayArrow, null)
                 Spacer(Modifier.width(6.dp))

@@ -2,9 +2,13 @@
 
 package de.remsky.rotweiss.ui
 
+import android.app.UiModeManager
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,6 +25,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +64,52 @@ val AppColors = darkColorScheme(
 )
 
 val Gold = Color(0xFFFFC145)
+
+/** Läuft die App auf einem Fernseher (Fire TV, Android TV)? */
+object TvMode {
+    var enabled = false
+        private set
+
+    fun detect(ctx: Context) {
+        val ui = ctx.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
+        val pm = ctx.packageManager
+        enabled = ui?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION ||
+            pm.hasSystemFeature("amazon.hardware.fire_tv") ||
+            pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+    }
+}
+
+/**
+ * Auf dem Fernseher: Oberfläche passend zur Bildschirmbreite vergrößern (Fire TV rechnet
+ * mit sehr kleinen dp-Werten) und die Fokus-Markierung deutlich machen.
+ */
+@Composable
+fun TvTheme(content: @Composable () -> Unit) {
+    if (!TvMode.enabled) {
+        content()
+        return
+    }
+    val d = LocalDensity.current
+    val scale = (LocalConfiguration.current.screenWidthDp / 1000f).coerceIn(1f, 1.6f)
+    CompositionLocalProvider(
+        LocalDensity provides Density(d.density * scale, d.fontScale),
+        LocalRippleConfiguration provides RippleConfiguration(
+            color = Color.White,
+            rippleAlpha = RippleAlpha(
+                draggedAlpha = 0.2f, focusedAlpha = 0.45f, hoveredAlpha = 0.1f, pressedAlpha = 0.3f,
+            ),
+        ),
+        content = content,
+    )
+}
+
+/** Weißer Rahmen um das fokussierte Element (Fernbedienung). Vor `clickable` einsetzen. */
+fun Modifier.focusHighlight(shape: Shape = RoundedCornerShape(10.dp)): Modifier = composed {
+    var focused by remember { mutableStateOf(false) }
+    Modifier
+        .onFocusChanged { focused = it.hasFocus || it.isFocused }
+        .then(if (focused) Modifier.border(3.dp, Color.White, shape) else Modifier)
+}
 
 fun Context.openPlayer() {
     startActivity(Intent(this, PlayerActivity::class.java))
@@ -156,7 +212,7 @@ fun PosterCard(
     favorite: Boolean,
     onClick: () -> Unit,
 ) {
-    Column(Modifier.clickable(onClick = onClick).padding(4.dp)) {
+    Column(Modifier.focusHighlight().clickable(onClick = onClick).padding(4.dp)) {
         Box(
             Modifier.fillMaxWidth().aspectRatio(2f / 3f).clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant),

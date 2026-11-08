@@ -136,7 +136,7 @@ private fun Section(title: String) {
 
 @Composable
 private fun ResumeCard(w: WatchEntry, onClick: () -> Unit, onRemove: () -> Unit) {
-    Column(Modifier.width(200.dp).clickable(onClick = onClick)) {
+    Column(Modifier.width(200.dp).focusHighlight().clickable(onClick = onClick)) {
         Box(
             Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant),

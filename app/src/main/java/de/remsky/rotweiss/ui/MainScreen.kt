@@ -10,8 +10,13 @@ import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 
 private fun Tab.icon(): ImageVector = when (this) {
     Tab.FC -> Icons.Default.SportsSoccer
@@ -19,6 +24,17 @@ private fun Tab.icon(): ImageVector = when (this) {
     Tab.MOVIES -> Icons.Default.Movie
     Tab.SERIES -> Icons.Default.VideoLibrary
     Tab.FAVORITES -> Icons.Default.Favorite
+}
+
+@Composable
+private fun TabContent(vm: AppViewModel) {
+    when (vm.tab) {
+        Tab.FC -> FcScreen(vm)
+        Tab.LIVE -> LiveScreen(vm)
+        Tab.MOVIES -> MoviesScreen(vm)
+        Tab.SERIES -> SeriesScreen(vm)
+        Tab.FAVORITES -> FavoritesScreen(vm)
+    }
 }
 
 @Composable
@@ -43,6 +59,29 @@ fun MainScreen(vm: AppViewModel) {
         return
     }
 
+    // Fernseher: Seitenleiste links, per Pfeiltasten bedienbar
+    if (TvMode.enabled) {
+        val startFocus = remember { FocusRequester() }
+        LaunchedEffect(Unit) { runCatching { startFocus.requestFocus() } }
+        Row(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 12.dp)) {
+            NavigationRail(containerColor = MaterialTheme.colorScheme.surface) {
+                Spacer(Modifier.weight(1f))
+                Tab.entries.forEach { t ->
+                    NavigationRailItem(
+                        selected = vm.tab == t,
+                        onClick = { vm.tab = t },
+                        icon = { Icon(t.icon(), null) },
+                        label = { Text(t.title) },
+                        modifier = if (t == vm.tab) Modifier.focusRequester(startFocus) else Modifier,
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+            }
+            Box(Modifier.weight(1f).fillMaxHeight()) { TabContent(vm) }
+        }
+        return
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -59,14 +98,6 @@ fun MainScreen(vm: AppViewModel) {
             }
         },
     ) { pad ->
-        Box(Modifier.fillMaxSize().padding(pad)) {
-            when (vm.tab) {
-                Tab.FC -> FcScreen(vm)
-                Tab.LIVE -> LiveScreen(vm)
-                Tab.MOVIES -> MoviesScreen(vm)
-                Tab.SERIES -> SeriesScreen(vm)
-                Tab.FAVORITES -> FavoritesScreen(vm)
-            }
-        }
+        Box(Modifier.fillMaxSize().padding(pad)) { TabContent(vm) }
     }
 }

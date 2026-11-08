@@ -7,7 +7,8 @@ IPTV-App für Android (Xtream-Codes-Zugang) im rot-weißen Look – für FC-Fans
 - **Live-TV:** Kategorien, Suche, Jetzt/Danach, Programm (EPG), Catch-up
 - **Filme & Serien:** Poster, Suche, Sortierung, Fortsetzen, automatisch nächste Folge
 - **Meine:** Weiterschauen und Favoriten
-- **Kindersperre** und **Bild-in-Bild**
+- **Kindersperre** und **Bild-in-Bild** (Handy)
+- **Fire TV / Android TV:** Bedienung nur mit der Fernbedienung, Seitenleiste, große Oberfläche, im Player ▲▼ Sender wechseln, ◀▶ spulen, OK Pause/Info
 
 ## APK
 

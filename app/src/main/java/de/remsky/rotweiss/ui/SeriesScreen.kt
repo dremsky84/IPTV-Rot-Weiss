@@ -20,6 +20,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -84,6 +86,8 @@ fun SeriesDetailScreen(vm: AppViewModel, s: Series) {
     }
 
     val key = "series:${s.seriesId}"
+    val playFocus = remember { FocusRequester() }
+    LaunchedEffect(loaded) { if (TvMode.enabled && loaded) runCatching { playFocus.requestFocus() } }
     val fav = vm.isFavorite(key)
     val i = info
     val seasons = i?.episodes?.keys?.sorted().orEmpty()
@@ -127,7 +131,7 @@ fun SeriesDetailScreen(vm: AppViewModel, s: Series) {
             Button(
                 onClick = { if (i != null && first != null) { vm.playEpisode(s, i, first); ctx.openPlayer() } },
                 enabled = first != null,
-                modifier = Modifier.weight(1f).height(48.dp),
+                modifier = Modifier.weight(1f).height(48.dp).focusRequester(playFocus),
             ) {
                 Icon(Icons.Default.PlayArrow, null)
                 Spacer(Modifier.width(6.dp))
