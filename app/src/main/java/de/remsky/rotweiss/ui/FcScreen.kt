@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -101,6 +103,7 @@ fun FcScreen(vm: AppViewModel) {
     }
 
     var view by remember { mutableIntStateOf(0) } // 0 = Spielplan, 1 = Tabelle
+    val scroll = rememberScrollState()
     val data = vm.fc
 
     Column(Modifier.fillMaxSize()) {
@@ -128,16 +131,16 @@ fun FcScreen(vm: AppViewModel) {
             else -> {
                 val next = data.next(now)
                 val last = data.last(now)
-                LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
-                    item(key = "photo") { FcHero() }
+                Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(bottom = 24.dp)) {
+                    FcHero()
                     if (next != null) {
-                        item(key = "next") { NextMatchCard(vm, data, next, now) }
+                        NextMatchCard(vm, data, next, now)
                     } else {
-                        item(key = "fcch") { Box(Modifier.padding(16.dp)) { FcChannelStrip(vm) } }
+                        Box(Modifier.padding(16.dp)) { FcChannelStrip(vm) }
                     }
-                    if (last != null) item(key = "last") { LastMatchCard(data, last) }
+                    if (last != null) LastMatchCard(data, last)
 
-                    item(key = "switch") {
+                    run {
                         Row(
                             Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -148,10 +151,10 @@ fun FcScreen(vm: AppViewModel) {
                     }
 
                     if (view == 0) {
-                        items(data.matches, key = { "m${it.id}" }) { m -> ScheduleRow(data, m, now) }
+                        data.matches.forEach { m -> ScheduleRow(data, m, now) }
                     } else {
-                        item(key = "thead") { TableHeader() }
-                        itemsIndexed(data.table, key = { i, _ -> "t$i" }) { _, r ->
+                        TableHeader()
+                        data.table.forEach { r ->
                             val fc = r.teamId == data.teamId
                             Row(
                                 Modifier.fillMaxWidth()
