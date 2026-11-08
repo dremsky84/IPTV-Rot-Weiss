@@ -2,6 +2,7 @@
 
 package de.remsky.rotweiss.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +20,10 @@ import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import de.remsky.rotweiss.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -122,6 +127,19 @@ fun FcScreen(vm: AppViewModel) {
                 val next = data.next(now)
                 val last = data.last(now)
                 LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
+                    item(key = "photo") {
+                        Box(Modifier.fillMaxWidth().height(150.dp)) {
+                            Image(
+                                painterResource(R.drawable.fan_photo), null, Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop, alignment = BiasAlignment(0f, -0.2f),
+                            )
+                            Box(
+                                Modifier.fillMaxSize().background(
+                                    Brush.verticalGradient(listOf(Color.Transparent, MaterialTheme.colorScheme.background))
+                                )
+                            )
+                        }
+                    }
                     if (next != null) {
                         item(key = "next") { NextMatchCard(vm, data, next, now) }
                     } else {

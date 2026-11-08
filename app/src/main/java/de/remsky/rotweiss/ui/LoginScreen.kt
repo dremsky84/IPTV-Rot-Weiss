@@ -1,5 +1,7 @@
 package de.remsky.rotweiss.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,7 +13,11 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import de.remsky.rotweiss.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,6 +27,19 @@ import de.remsky.rotweiss.data.Credentials
 
 @Composable
 fun LoginScreen(vm: AppViewModel) {
+    Box(Modifier.fillMaxSize()) {
+        Image(painterResource(R.drawable.fan_photo), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(listOf(Color(0xCC140C0D), Color(0xEE140C0D), Color(0xF25A0A0E)))
+            )
+        )
+        LoginForm(vm)
+    }
+}
+
+@Composable
+private fun LoginForm(vm: AppViewModel) {
     val saved = vm.savedCredentials
     var server by remember { mutableStateOf(saved?.server ?: "") }
     var user by remember { mutableStateOf(saved?.user ?: "") }
