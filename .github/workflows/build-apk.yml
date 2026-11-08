@@ -24,7 +24,15 @@ jobs:
           gradle-version: "8.9"
 
       - name: APK bauen
-        run: gradle assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          gradle assembleDebug --no-daemon 2>&1 | tee build.log
+
+      # Bei Fehlern die Compiler-Meldungen als Hinweise anzeigen
+      - name: Fehler anzeigen
+        if: failure()
+        run: |
+          grep -E "^e: |What went wrong|error:|Execution failed" -A2 build.log | head -60 | while IFS= read -r l; do echo "::error::${l}"; done
 
       - name: APK umbenennen
         run: cp app/build/outputs/apk/debug/app-debug.apk IPTV-Rot-Weiss.apk
